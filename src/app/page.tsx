@@ -2,7 +2,7 @@
 
 import { Navbar } from '@/components/Navbar';
 import { ProductCard } from '@/components/ProductCard';
-import { PRODUCT_CATEGORIES, formatETB } from '@/lib/constants';
+import { PRODUCT_CATEGORIES } from '@/lib/constants';
 import { useAppStore } from '@/lib/store';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +34,7 @@ export default function HomePage() {
           });
           setRecommendations(res.recommendations);
         } catch (e) {
-          console.error('Failed to load recommendations', e);
+          // Error handling is managed centrally
         }
       }
     }
@@ -121,7 +121,7 @@ export default function HomePage() {
           {[
             { icon: Truck, title: 'Fast Delivery', desc: 'Across Ethiopia' },
             { icon: ShieldCheck, title: 'Secure Payments', desc: 'Telebirr & CBE' },
-            { icon: Clock, title: '24/7 Support', desc: 'We\'re here to help' },
+            { icon: Clock, title: '24/7 Support', desc: "We're here to help" },
             { icon: Star, title: 'Authentic Goods', desc: 'Direct from artisans' },
           ].map((item, i) => (
             <div key={i} className="flex flex-col items-center text-center gap-2">

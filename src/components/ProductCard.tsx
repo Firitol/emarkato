@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -35,13 +34,19 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <div className="group relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-primary/5 flex flex-col h-full">
       <Link href={`/product/${product.id}`} className="block relative aspect-square overflow-hidden bg-muted">
-        <Image 
-          src={product.images[0]} 
-          alt={product.name}
-          fill
-          className="object-cover transform transition-transform duration-500 group-hover:scale-110"
-          data-ai-hint="product image"
-        />
+        {product.images[0] ? (
+          <Image 
+            src={product.images[0]} 
+            alt={product.name}
+            fill
+            className="object-cover transform transition-transform duration-500 group-hover:scale-110"
+            data-ai-hint="product image"
+          />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground text-xs text-center p-4">
+            No image available
+          </div>
+        )}
         
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2">

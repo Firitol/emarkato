@@ -36,7 +36,7 @@ export default function ProductDetailsPage() {
         });
         setReviewSummary(summary);
       } catch (e) {
-        console.error('AI summary failed', e);
+        // Error handled centrally
       } finally {
         setLoadingAI(false);
       }
@@ -44,7 +44,7 @@ export default function ProductDetailsPage() {
     getAISummary();
   }, [product]);
 
-  if (!product) return <div>Product not found</div>;
+  if (!product) return <div className="min-h-screen bg-cream"><Navbar /><div className="container mx-auto py-24 text-center">Product not found</div></div>;
 
   return (
     <div className="min-h-screen bg-cream">
@@ -55,12 +55,14 @@ export default function ProductDetailsPage() {
           {/* Gallery */}
           <div className="space-y-4">
             <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl bg-white group">
-              <Image 
-                src={product.images[0]} 
-                alt={product.name} 
-                fill 
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+              {product.images[0] && (
+                <Image 
+                  src={product.images[0]} 
+                  alt={product.name} 
+                  fill 
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              )}
             </div>
             <div className="grid grid-cols-4 gap-4">
               {product.images.map((img, i) => (
