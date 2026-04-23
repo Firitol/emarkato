@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -29,7 +28,7 @@ export function Navbar() {
             <span className="text-white font-headline font-bold text-xl">E</span>
           </div>
           <span className="text-2xl font-headline font-bold text-foreground hidden sm:block">
-            Ethio<span className="text-primary">Mart</span>
+            E-<span className="text-primary">Marcato</span>
           </span>
         </Link>
 

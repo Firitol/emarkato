@@ -36,7 +36,7 @@ const recommendationPrompt = ai.definePrompt({
   name: 'customerProductRecommendationsPrompt',
   input: {schema: CustomerProductRecommendationsInputSchema},
   output: {schema: CustomerProductRecommendationsOutputSchema},
-  prompt: `You are an e-commerce recommendation engine for EthioMart. Your goal is to suggest personalized products to customers based on their past interactions.
+  prompt: `You are an e-commerce recommendation engine for E-Marcato. Your goal is to suggest personalized products to customers based on their past interactions.
 Based on the customer's browsing history and recently viewed items, recommend up to 5 products that they might be interested in. Focus on items similar to their interests or popular items from categories they frequently visit.
 Provide the recommendations as a simple list of product names/descriptions.
 

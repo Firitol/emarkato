@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Navbar } from '@/components/Navbar';
@@ -207,7 +206,7 @@ export default function HomePage() {
           <div className="w-96 h-96 border-8 border-accent rounded-full -mr-48 -mt-48" />
         </div>
         <div className="container mx-auto px-4 relative z-10 text-center max-w-2xl">
-          <h2 className="text-4xl font-headline font-bold mb-6">Join the EthioMart Community</h2>
+          <h2 className="text-4xl font-headline font-bold mb-6">Join the E-Marcato Community</h2>
           <p className="text-lg opacity-80 mb-10">
             Sign up now for exclusive deals on Habesha crafts and traditional coffee beans.
           </p>
@@ -228,10 +227,10 @@ export default function HomePage() {
           <div>
             <div className="flex items-center gap-2 mb-6">
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold">E</div>
-              <span className="text-xl font-headline font-bold">EthioMart</span>
+              <span className="text-xl font-headline font-bold">E-Marcato</span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              EthioMart is Ethiopia's premier online marketplace, connecting local artisans and sellers with customers worldwide.
+              E-Marcato is Ethiopia's premier online marketplace, connecting local artisans and sellers with customers worldwide.
             </p>
           </div>
           <div>
@@ -239,7 +238,7 @@ export default function HomePage() {
             <ul className="space-y-4 text-sm text-gray-400">
               <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
               <li><Link href="/search" className="hover:text-primary transition-colors">Shop All</Link></li>
-              <li><Link href="/become-seller" className="hover:text-primary transition-colors">Sell on EthioMart</Link></li>
+              <li><Link href="/become-seller" className="hover:text-primary transition-colors">Sell on E-Marcato</Link></li>
               <li><Link href="/orders" className="hover:text-primary transition-colors">Track Order</Link></li>
             </ul>
           </div>
@@ -262,7 +261,7 @@ export default function HomePage() {
           </div>
         </div>
         <div className="container mx-auto px-4 pt-12 mt-12 border-t border-gray-800 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} EthioMart Marketplace. All rights reserved.
+          © {new Date().getFullYear()} E-Marcato Marketplace. All rights reserved.
         </div>
       </footer>
     </div>

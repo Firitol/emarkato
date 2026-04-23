@@ -40,7 +40,7 @@ const prompt = ai.definePrompt({
   name: 'sellerProductDescriptionAssistantPrompt',
   input: {schema: SellerProductDescriptionAssistantInputSchema},
   output: {schema: SellerProductDescriptionAssistantOutputSchema},
-  prompt: `You are an expert marketing copywriter for an e-commerce platform in Ethiopia, EthioMart.
+  prompt: `You are an expert marketing copywriter for an e-commerce platform in Ethiopia, E-Marcato.
 Your task is to generate a comprehensive and engaging product description based on the provided details.
 Focus on highlighting the benefits and unique selling points for the Ethiopian market.
 

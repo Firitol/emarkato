@@ -1,9 +1,8 @@
-
 import type {Metadata} from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'EthioMart | Ethiopia\'s Premier Marketplace',
+  title: 'E-Marcato | Ethiopia\'s Premier Marketplace',
   description: 'Shop authentic Ethiopian crafts, spices, and modern electronics.',
 };
 

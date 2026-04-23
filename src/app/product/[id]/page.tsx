@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -133,7 +132,7 @@ export default function ProductDetailsPage() {
             
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Shield className="w-5 h-5 text-success" />
-              <span>EthioMart Verified Guarantee. Your satisfaction is our priority.</span>
+              <span>E-Marcato Verified Guarantee. Your satisfaction is our priority.</span>
             </div>
           </div>
         </div>
