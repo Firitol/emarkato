@@ -4,6 +4,8 @@
 import { useAppStore } from '@/lib/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 import { 
   Plus, 
   ShoppingBag, 
@@ -103,7 +105,7 @@ export default function SellerDashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           {[
-            { label: 'Total Revenue', value: formatETB(124500), icon: TrendingUp, color: 'text-success' },
+            { label: 'Total Revenue', value: formatETB(124500), icon: TrendingUp, color: 'text-primary' },
             { label: 'Active Orders', value: '18', icon: ShoppingBag, color: 'text-primary' },
             { label: 'Total Products', value: sellerProducts.length.toString(), icon: Package, color: 'text-accent' },
             { label: 'Store Visitors', value: '1,204', icon: Users, color: 'text-blue-500' },
@@ -172,14 +174,16 @@ export default function SellerDashboard() {
                 <div key={p.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-primary/5">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 relative rounded-lg overflow-hidden shrink-0">
-                      <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
+                      {p.images[0] && (
+                        <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
+                      )}
                     </div>
                     <div>
                       <div className="font-bold">{p.name}</div>
                       <div className="text-xs text-muted-foreground">{p.categoryId} • {formatETB(p.price)}</div>
                     </div>
                   </div>
-                  <Badge className={p.status === 'approved' ? 'bg-success/10 text-success border-none' : 'bg-warning/10 text-warning border-none'}>
+                  <Badge variant={p.status === 'approved' ? 'default' : 'secondary'} className="border-none">
                     {p.status}
                   </Badge>
                 </div>

@@ -86,7 +86,7 @@ export function useAppStore() {
   const login = (role: User['role']) => {
     const mockUser: User = {
       id: 'u1',
-      email: `${role}@ethiomart.com`,
+      email: `${role}@emarcato.com`,
       name: role.charAt(0).toUpperCase() + role.slice(1) + ' User',
       role: role
     };
