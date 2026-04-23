@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -12,13 +13,22 @@ import { ShoppingCart, Heart, Shield, Truck, RotateCcw, Star, ThumbsUp, ThumbsDo
 import { formatETB } from '@/lib/constants';
 import { useToast } from '@/hooks/use-toast';
 import { summarizeProductReviews, type ProductReviewSummaryOutput } from '@/ai/flows/customer-product-review-summaries';
+import { useFirestore, useDoc, useMemoFirebase } from '@/firebase';
+import { doc } from 'firebase/firestore';
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
-  const { products, addToCart } = useAppStore();
-  const product = products.find(p => p.id === id);
+  const db = useFirestore();
+  const { addToCart } = useAppStore();
   const { toast } = useToast();
   
+  // Fetch specific product from Firestore
+  const productRef = useMemoFirebase(() => {
+    if (!db || !id) return null;
+    return doc(db, 'products_public', id as string);
+  }, [db, id]);
+  const { data: product, isLoading: productLoading } = useDoc(productRef);
+
   const [reviewSummary, setReviewSummary] = useState<ProductReviewSummaryOutput | null>(null);
   const [loadingAI, setLoadingAI] = useState(false);
 
@@ -44,6 +54,8 @@ export default function ProductDetailsPage() {
     getAISummary();
   }, [product]);
 
+  if (productLoading) return <div className="min-h-screen bg-cream"><Navbar /><div className="container mx-auto py-24 text-center">Loading product details...</div></div>;
+  
   if (!product) return <div className="min-h-screen bg-cream"><Navbar /><div className="container mx-auto py-24 text-center">Product not found</div></div>;
 
   return (
@@ -55,7 +67,7 @@ export default function ProductDetailsPage() {
           {/* Gallery */}
           <div className="space-y-4">
             <div className="relative aspect-square rounded-3xl overflow-hidden shadow-2xl bg-white group">
-              {product.images[0] && (
+              {product.images && product.images[0] && (
                 <Image 
                   src={product.images[0]} 
                   alt={product.name} 
@@ -65,7 +77,7 @@ export default function ProductDetailsPage() {
               )}
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {product.images.map((img, i) => (
+              {product.images?.map((img, i) => (
                 <div key={i} className="relative aspect-square rounded-xl overflow-hidden shadow-md cursor-pointer border-2 border-transparent hover:border-primary transition-all">
                   <Image src={img} alt={`${product.name} ${i}`} fill className="object-cover" />
                 </div>
@@ -120,7 +132,7 @@ export default function ProductDetailsPage() {
                   addToCart(product.id);
                   toast({ title: "Success", description: "Added to cart" });
                 }}
-                className="flex-1 h-14 rounded-2xl bg-primary hover:bg-primary/90 text-lg shadow-lg shadow-primary/20"
+                className="flex-1 h-14 rounded-2xl bg-primary text-white hover:bg-primary/90 text-lg shadow-lg shadow-primary/20"
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Add to Cart
@@ -133,7 +145,7 @@ export default function ProductDetailsPage() {
             <Separator className="mb-8" />
             
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
-              <Shield className="w-5 h-5 text-success" />
+              <Shield className="w-5 h-5 text-green-600" />
               <span>E-Marcato Verified Guarantee. Your satisfaction is our priority.</span>
             </div>
           </div>
@@ -143,8 +155,8 @@ export default function ProductDetailsPage() {
         <section className="bg-white rounded-3xl p-8 lg:p-12 shadow-xl mb-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
-              <h2 className="text-2xl font-headline font-bold mb-2">Customer Feedback</h2>
-              <p className="text-muted-foreground">Smart insights generated from 100+ reviews</p>
+              <h2 className="text-2xl font-headline font-bold mb-2 text-foreground">Customer Feedback</h2>
+              <p className="text-muted-foreground">Smart insights generated from community reviews</p>
             </div>
             {loadingAI ? (
               <Badge variant="outline" className="animate-pulse">Analyzing reviews...</Badge>
@@ -163,13 +175,13 @@ export default function ProductDetailsPage() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <h4 className="flex items-center gap-2 font-bold text-success text-sm">
+                  <h4 className="flex items-center gap-2 font-bold text-green-600 text-sm">
                     <ThumbsUp className="w-4 h-4" /> Pros
                   </h4>
                   <ul className="space-y-2">
                     {reviewSummary.commonPros.map((pro, i) => (
                       <li key={i} className="text-sm flex items-start gap-2">
-                        <span className="w-1 h-1 rounded-full bg-success mt-1.5 shrink-0" />
+                        <span className="w-1 h-1 rounded-full bg-green-600 mt-1.5 shrink-0" />
                         {pro}
                       </li>
                     ))}

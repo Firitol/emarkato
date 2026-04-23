@@ -5,7 +5,8 @@ import { useState, useEffect } from 'react';
 import type { User, Product, CartItem, Order } from './types';
 import { PlaceHolderImages } from './placeholder-images';
 
-// Initial Mock Data
+// Note: Products are now primarily fetched from Firestore, 
+// but we keep MOCK_PRODUCTS as a fallback or initial state if needed.
 const MOCK_PRODUCTS: Product[] = [
   {
     id: 'p1',
@@ -16,7 +17,7 @@ const MOCK_PRODUCTS: Product[] = [
     price: 850,
     comparePrice: 1200,
     stock: 15,
-    images: [PlaceHolderImages.find(img => img.id === 'jebena')?.imageUrl || ''],
+    images: [PlaceHolderImages.find(img => img.id === 'jebena')?.imageUrl || 'https://picsum.photos/seed/jebena/600/600'],
     rating: 4.8,
     reviewCount: 24,
     featured: true,
@@ -30,39 +31,10 @@ const MOCK_PRODUCTS: Product[] = [
     description: 'Stunning hand-woven traditional dress with vibrant floral patterns.',
     price: 4500,
     stock: 5,
-    images: [PlaceHolderImages.find(img => img.id === 'habesha-dress')?.imageUrl || ''],
+    images: [PlaceHolderImages.find(img => img.id === 'habesha-dress')?.imageUrl || 'https://picsum.photos/seed/habesha-dress/600/800'],
     rating: 4.9,
     reviewCount: 12,
     featured: true,
-    status: 'approved'
-  },
-  {
-    id: 'p3',
-    sellerId: 's2',
-    categoryId: 'coffee',
-    name: 'Premium Yirgacheffe Coffee Beans',
-    description: 'Whole bean organic coffee with distinctive floral and citrus notes.',
-    price: 600,
-    comparePrice: 750,
-    stock: 50,
-    images: [PlaceHolderImages.find(img => img.id === 'coffee-beans')?.imageUrl || ''],
-    rating: 4.7,
-    reviewCount: 45,
-    featured: true,
-    status: 'approved'
-  },
-  {
-    id: 'p4',
-    sellerId: 's3',
-    categoryId: 'electronics',
-    name: 'Samsung Galaxy S23 Ultra',
-    description: 'Latest flagship smartphone with 200MP camera.',
-    price: 78000,
-    stock: 10,
-    images: [PlaceHolderImages.find(img => img.id === 'smartphone')?.imageUrl || ''],
-    rating: 4.6,
-    reviewCount: 8,
-    featured: false,
     status: 'approved'
   }
 ];
@@ -75,7 +47,6 @@ export function useAppStore() {
   const [wishlist, setWishlist] = useState<string[]>([]);
 
   useEffect(() => {
-    // Basic persistence mock
     const savedCart = localStorage.getItem('emarcato_cart');
     if (savedCart) setCart(JSON.parse(savedCart));
     
@@ -85,8 +56,8 @@ export function useAppStore() {
 
   const login = (role: User['role']) => {
     const mockUser: User = {
-      id: 'u1',
-      email: `${role}@emarcato.com`,
+      id: role === 'seller' ? 's1' : 'u1',
+      email: `${role}@e-marcato.com`,
       name: role.charAt(0).toUpperCase() + role.slice(1) + ' User',
       role: role
     };
@@ -128,7 +99,10 @@ export function useAppStore() {
       id: 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
       customerId: user?.id || 'guest',
       status: 'pending',
-      total: cart.reduce((acc, item) => acc + (products.find(p => p.id === item.productId)?.price || 0) * item.quantity, 0),
+      total: cart.reduce((acc, item) => {
+        const p = products.find(prod => prod.id === item.productId);
+        return acc + (p?.price || 0) * item.quantity;
+      }, 0),
       createdAt: new Date().toISOString(),
       paymentMethod: orderDetails.paymentMethod,
       shippingAddress: orderDetails.shippingAddress

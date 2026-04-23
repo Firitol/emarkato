@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Navbar } from '@/components/Navbar';
@@ -13,11 +14,20 @@ import Link from 'next/link';
 import { ArrowRight, Star, Truck, ShieldCheck, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { customerProductRecommendations } from '@/ai/flows/customer-product-recommendations';
+import { useCollection, useFirestore, useMemoFirebase } from '@/firebase';
+import { collection, query, where, limit } from 'firebase/firestore';
 
 export default function HomePage() {
-  const { products, user } = useAppStore();
+  const { user } = useAppStore();
+  const db = useFirestore();
   const [recommendations, setRecommendations] = useState<string[]>([]);
-  const featuredProducts = products.filter(p => p.featured);
+
+  // Fetch featured products from Firestore
+  const featuredQuery = useMemoFirebase(() => {
+    if (!db) return null;
+    return query(collection(db, 'products_public'), where('featured', '==', true), limit(4));
+  }, [db]);
+  const { data: featuredProducts, isLoading: productsLoading } = useCollection(featuredQuery);
 
   const heroBg = PlaceHolderImages.find(img => img.id === 'hero-bg')?.imageUrl;
   const habeshaDress = PlaceHolderImages.find(img => img.id === 'habesha-dress')?.imageUrl;
@@ -34,7 +44,7 @@ export default function HomePage() {
           });
           setRecommendations(res.recommendations);
         } catch (e) {
-          // Error handling is managed centrally
+          // Error handling managed centrally
         }
       }
     }
@@ -78,7 +88,7 @@ export default function HomePage() {
                   Shop Now
                 </Button>
               </Link>
-              <Link href="/become-seller">
+              <Link href="/seller">
                 <Button size="lg" variant="outline" className="rounded-full px-8 border-primary text-primary hover:bg-primary/5 text-lg">
                   Start Selling
                 </Button>
@@ -150,8 +160,8 @@ export default function HomePage() {
           {PRODUCT_CATEGORIES.map((cat) => (
             <Link key={cat.id} href={`/category/${cat.id}`} className="group">
               <div className="aspect-square bg-white rounded-2xl p-6 flex flex-col items-center justify-center gap-3 border border-primary/5 shadow-sm group-hover:shadow-md group-hover:border-primary/20 transition-all">
-                <div className="w-12 h-12 bg-cream rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                  <Image src={`https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} width={40} height={40} className="rounded-full grayscale group-hover:grayscale-0" />
+                <div className="w-12 h-12 bg-cream rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors relative overflow-hidden">
+                   <Image src={`https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} width={40} height={40} className="rounded-full grayscale group-hover:grayscale-0" />
                 </div>
                 <span className="text-xs font-bold text-center group-hover:text-primary transition-colors">{cat.name}</span>
               </div>
@@ -168,7 +178,7 @@ export default function HomePage() {
               <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
                 <Star className="w-4 h-4 text-white fill-white" />
               </div>
-              <h2 className="text-2xl font-headline font-bold">Recommended For You</h2>
+              <h2 className="text-2xl font-headline font-bold text-accent-foreground">Recommended For You</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
               {recommendations.slice(0, 4).map((rec, i) => (
@@ -193,11 +203,25 @@ export default function HomePage() {
             View Gallery <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {featuredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {productsLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="aspect-square bg-white animate-pulse rounded-2xl border border-primary/5" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProducts && featuredProducts.length > 0 ? (
+              featuredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12 text-muted-foreground italic">
+                No featured products found.
+              </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Footer CTA */}
@@ -226,7 +250,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
           <div>
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold">E</div>
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold text-white">E</div>
               <span className="text-xl font-headline font-bold">E-Marcato</span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
@@ -238,7 +262,7 @@ export default function HomePage() {
             <ul className="space-y-4 text-sm text-gray-400">
               <li><Link href="/" className="hover:text-primary transition-colors">Home</Link></li>
               <li><Link href="/search" className="hover:text-primary transition-colors">Shop All</Link></li>
-              <li><Link href="/become-seller" className="hover:text-primary transition-colors">Sell on E-Marcato</Link></li>
+              <li><Link href="/seller" className="hover:text-primary transition-colors">Sell on E-Marcato</Link></li>
               <li><Link href="/orders" className="hover:text-primary transition-colors">Track Order</Link></li>
             </ul>
           </div>
@@ -256,7 +280,7 @@ export default function HomePage() {
             <p className="text-sm text-gray-400 mb-4">Stay updated with the latest arrivals and offers.</p>
             <div className="flex gap-2">
               <Input placeholder="Email address" className="bg-gray-800 border-none rounded-full text-white placeholder:text-gray-500" />
-              <Button size="icon" className="rounded-full bg-primary shrink-0"><ArrowRight className="w-4 h-4" /></Button>
+              <Button size="icon" className="rounded-full bg-primary shrink-0 text-white"><ArrowRight className="w-4 h-4" /></Button>
             </div>
           </div>
         </div>

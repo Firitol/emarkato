@@ -26,6 +26,8 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
+import { useFirestore, useCollection, useMemoFirebase } from '@/firebase';
+import { collection, query, where } from 'firebase/firestore';
 
 const chartData = [
   { month: "Jan", sales: 45000 },
@@ -44,8 +46,28 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export default function SellerDashboard() {
-  const { user, products, logout } = useAppStore();
-  const sellerProducts = products.filter(p => p.sellerId === 's1'); // Mock seller
+  const { user, logout } = useAppStore();
+  const db = useFirestore();
+
+  // Fetch products managed by this seller
+  const productsQuery = useMemoFirebase(() => {
+    if (!db || !user) return null;
+    return query(collection(db, 'products_public'), where('sellerId', '==', user.id));
+  }, [db, user]);
+  const { data: sellerProducts } = useCollection(productsQuery);
+
+  if (!user || user.role !== 'seller') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Unauthorized</h1>
+          <Link href="/login">
+            <Button className="rounded-full">Login as Seller</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-muted/30 flex">
@@ -98,7 +120,7 @@ export default function SellerDashboard() {
             <h1 className="text-3xl font-headline font-bold">Welcome back, {user?.name.split(' ')[0]}</h1>
             <p className="text-muted-foreground">Here's what's happening with your E-Marcato store today.</p>
           </div>
-          <Button className="bg-primary rounded-xl px-6 shadow-lg shadow-primary/20">
+          <Button className="bg-primary text-white rounded-xl px-6 shadow-lg shadow-primary/20">
             <Plus className="w-5 h-5 mr-2" />
             Add New Product
           </Button>
@@ -109,7 +131,7 @@ export default function SellerDashboard() {
           {[
             { label: 'Total Revenue', value: formatETB(124500), icon: TrendingUp, color: 'text-primary' },
             { label: 'Active Orders', value: '18', icon: ShoppingBag, color: 'text-primary' },
-            { label: 'Total Products', value: sellerProducts.length.toString(), icon: Package, color: 'text-accent' },
+            { label: 'Total Products', value: sellerProducts?.length.toString() || '0', icon: Package, color: 'text-accent' },
             { label: 'Store Visitors', value: '1,204', icon: Users, color: 'text-blue-500' },
           ].map((stat, i) => (stat.icon && (
             <Card key={i} className="rounded-3xl border-primary/5 shadow-sm">
@@ -172,24 +194,30 @@ export default function SellerDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {sellerProducts.map((p) => (
-                <div key={p.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-primary/5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 relative rounded-lg overflow-hidden shrink-0 bg-muted">
-                      {p.images[0] && (
-                        <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
-                      )}
+              {sellerProducts && sellerProducts.length > 0 ? (
+                sellerProducts.map((p) => (
+                  <div key={p.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-primary/5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 relative rounded-lg overflow-hidden shrink-0 bg-muted">
+                        {p.images && p.images[0] && (
+                          <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="font-bold">{p.name}</div>
+                        <div className="text-xs text-muted-foreground">{p.categoryId} • {formatETB(p.price)}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-bold">{p.name}</div>
-                      <div className="text-xs text-muted-foreground">{p.categoryId} • {formatETB(p.price)}</div>
-                    </div>
+                    <Badge variant={p.status === 'approved' ? 'default' : 'secondary'} className="border-none">
+                      {p.status}
+                    </Badge>
                   </div>
-                  <Badge variant={p.status === 'approved' ? 'default' : 'secondary'} className="border-none">
-                    {p.status}
-                  </Badge>
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground italic">
+                  No products listed yet.
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>

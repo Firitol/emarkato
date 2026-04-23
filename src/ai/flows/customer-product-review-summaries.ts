@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview An AI agent that summarizes product reviews, highlighting common pros and cons.
@@ -51,7 +52,7 @@ const prompt = ai.definePrompt({
   name: 'summarizeProductReviewsPrompt',
   input: {schema: ProductReviewsInputSchema},
   output: {schema: ProductReviewSummaryOutputSchema},
-  prompt: `You are an AI assistant specialized in summarizing customer reviews for e-commerce products.
+  prompt: `You are an AI assistant specialized in summarizing customer reviews for e-commerce products on E-Marcato.
 Your task is to analyze a list of product reviews, identify common themes, positive feedback (pros), and negative feedback (cons), and provide a concise summary.
 
 Here are the product reviews:
@@ -65,12 +66,11 @@ Comment: "{{this.comment}}"
 {{/each}}
 
 Based on the reviews above, please provide:
-1.  An overall concise summary of the product reviews.
-2.  A list of common pros.
-3.  A list of common cons.
+1. An overall concise summary of the product reviews.
+2. A list of common pros.
+3. A list of common cons.
 
-Ensure the output is in the specified JSON format matching the output schema definitions.
-`,
+Ensure the output is in the specified JSON format.`,
 });
 
 const summarizeProductReviewsFlow = ai.defineFlow(
