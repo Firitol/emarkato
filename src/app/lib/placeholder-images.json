@@ -1,0 +1,59 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Ethiopian textile pattern background",
+      "imageUrl": "https://picsum.photos/seed/ethio-textile/1920/1080",
+      "imageHint": "Ethiopian textile"
+    },
+    {
+      "id": "jebena",
+      "description": "Traditional Ethiopian coffee pot (Jebena)",
+      "imageUrl": "https://picsum.photos/seed/jebena/600/600",
+      "imageHint": "coffee pot"
+    },
+    {
+      "id": "habesha-dress",
+      "description": "Traditional Habesha dress",
+      "imageUrl": "https://picsum.photos/seed/habesha-dress/600/800",
+      "imageHint": "traditional dress"
+    },
+    {
+      "id": "coffee-beans",
+      "description": "Ethiopian Yirgacheffe coffee beans",
+      "imageUrl": "https://picsum.photos/seed/coffee/600/600",
+      "imageHint": "coffee beans"
+    },
+    {
+      "id": "mesob",
+      "description": "Traditional Ethiopian basket (Mesob)",
+      "imageUrl": "https://picsum.photos/seed/mesob/600/600",
+      "imageHint": "traditional basket"
+    },
+    {
+      "id": "leather-sandals",
+      "description": "Handmade Ethiopian leather sandals",
+      "imageUrl": "https://picsum.photos/seed/sandals/600/600",
+      "imageHint": "leather sandals"
+    },
+    {
+      "id": "spices",
+      "description": "Ethiopian Berbere spices",
+      "imageUrl": "https://picsum.photos/seed/spices/600/600",
+      "imageHint": "spices"
+    },
+    {
+      "id": "smartphone",
+      "description": "Modern smartphone",
+      "imageUrl": "https://picsum.photos/seed/phone/600/600",
+      "imageHint": "smartphone"
+    },
+    {
+      "id": "laptop",
+      "description": "Modern laptop",
+      "imageUrl": "https://picsum.photos/seed/laptop/600/600",
+      "imageHint": "laptop"
+    }
+  ]
+}
