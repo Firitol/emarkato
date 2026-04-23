@@ -76,10 +76,10 @@ export function useAppStore() {
 
   useEffect(() => {
     // Basic persistence mock
-    const savedCart = localStorage.getItem('ethio_cart');
+    const savedCart = localStorage.getItem('emarcato_cart');
     if (savedCart) setCart(JSON.parse(savedCart));
     
-    const savedUser = localStorage.getItem('ethio_user');
+    const savedUser = localStorage.getItem('emarcato_user');
     if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
 
@@ -91,12 +91,12 @@ export function useAppStore() {
       role: role
     };
     setUser(mockUser);
-    localStorage.setItem('ethio_user', JSON.stringify(mockUser));
+    localStorage.setItem('emarcato_user', JSON.stringify(mockUser));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('ethio_user');
+    localStorage.removeItem('emarcato_user');
   };
 
   const addToCart = (productId: string) => {
@@ -105,7 +105,7 @@ export function useAppStore() {
       const newCart = existing 
         ? prev.map(item => item.productId === productId ? { ...item, quantity: item.quantity + 1 } : item)
         : [...prev, { productId, quantity: 1 }];
-      localStorage.setItem('ethio_cart', JSON.stringify(newCart));
+      localStorage.setItem('emarcato_cart', JSON.stringify(newCart));
       return newCart;
     });
   };
@@ -113,14 +113,14 @@ export function useAppStore() {
   const removeFromCart = (productId: string) => {
     setCart(prev => {
       const newCart = prev.filter(item => item.productId !== productId);
-      localStorage.setItem('ethio_cart', JSON.stringify(newCart));
+      localStorage.setItem('emarcato_cart', JSON.stringify(newCart));
       return newCart;
     });
   };
 
   const clearCart = () => {
     setCart([]);
-    localStorage.removeItem('ethio_cart');
+    localStorage.removeItem('emarcato_cart');
   };
 
   const placeOrder = (orderDetails: any) => {

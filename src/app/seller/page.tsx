@@ -52,7 +52,9 @@ export default function SellerDashboard() {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-primary/5 p-6 flex flex-col">
         <div className="flex items-center gap-2 mb-12">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">E</div>
+          <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white font-bold shadow-lg transform rotate-3">
+            <span className="text-xl font-headline font-bold">E</span>
+          </div>
           <span className="text-xl font-headline font-bold">SellerPortal</span>
         </div>
         
@@ -94,9 +96,9 @@ export default function SellerDashboard() {
         <header className="flex justify-between items-center mb-12">
           <div>
             <h1 className="text-3xl font-headline font-bold">Welcome back, {user?.name.split(' ')[0]}</h1>
-            <p className="text-muted-foreground">Here's what's happening with your store today.</p>
+            <p className="text-muted-foreground">Here's what's happening with your E-Marcato store today.</p>
           </div>
-          <Button className="bg-primary rounded-xl px-6">
+          <Button className="bg-primary rounded-xl px-6 shadow-lg shadow-primary/20">
             <Plus className="w-5 h-5 mr-2" />
             Add New Product
           </Button>
@@ -109,7 +111,7 @@ export default function SellerDashboard() {
             { label: 'Active Orders', value: '18', icon: ShoppingBag, color: 'text-primary' },
             { label: 'Total Products', value: sellerProducts.length.toString(), icon: Package, color: 'text-accent' },
             { label: 'Store Visitors', value: '1,204', icon: Users, color: 'text-blue-500' },
-          ].map((stat, i) => (
+          ].map((stat, i) => (stat.icon && (
             <Card key={i} className="rounded-3xl border-primary/5 shadow-sm">
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground flex items-center justify-between">
@@ -121,7 +123,7 @@ export default function SellerDashboard() {
                 <div className="text-2xl font-bold">{stat.value}</div>
               </CardContent>
             </Card>
-          ))}
+          )))}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-12">
@@ -173,7 +175,7 @@ export default function SellerDashboard() {
               {sellerProducts.map((p) => (
                 <div key={p.id} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-primary/5">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 relative rounded-lg overflow-hidden shrink-0">
+                    <div className="w-12 h-12 relative rounded-lg overflow-hidden shrink-0 bg-muted">
                       {p.images[0] && (
                         <Image src={p.images[0]} alt={p.name} fill className="object-cover" />
                       )}
