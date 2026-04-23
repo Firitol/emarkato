@@ -57,7 +57,7 @@ Your task is to analyze a list of product reviews, identify common themes, posit
 Here are the product reviews:
 
 {{#each reviews}}
-Review {{increment @index 1}}:
+Review:
 Rating: {{this.rating}} out of 5
 {{#if this.title}}Title: "{{this.title}}"{{/if}}
 Comment: "{{this.comment}}"
