@@ -1,0 +1,814 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account within the EthioMart platform, encompassing customers, sellers, and administrators. Authentication data like password hashes are handled externally.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The unique email address of the user.",
+          "format": "email"
+        },
+        "name": {
+          "type": "string",
+          "description": "The full name of the user."
+        },
+        "phone": {
+          "type": "string",
+          "description": "The user's phone number."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role of the user within the platform (customer, seller, or admin).",
+          "format": "enum"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "URL to the user's avatar image.",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "name",
+        "role",
+        "createdAt"
+      ]
+    },
+    "Category": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Category",
+      "type": "object",
+      "description": "Defines product categories used for organization and browsing on the EthioMart marketplace.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Category entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the category (e.g., 'Electronics', 'Fashion')."
+        },
+        "slug": {
+          "type": "string",
+          "description": "A URL-friendly identifier for the category, unique across categories."
+        },
+        "icon": {
+          "type": "string",
+          "description": "Name of the Lucide icon associated with the category for UI display."
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "URL to an image representing the category.",
+          "format": "uri"
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Reference to a parent category, allowing for hierarchical categories. (Relationship: Category 1:N Category - self-referencing)"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "slug"
+      ]
+    },
+    "Seller": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Seller",
+      "type": "object",
+      "description": "Details pertaining to a seller on the EthioMart platform, including store information and approval status.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Seller entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the associated User account with a 'seller' role. (Relationship: User 1:1 Seller)"
+        },
+        "storeName": {
+          "type": "string",
+          "description": "The unique name of the seller's store."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the seller's store or business."
+        },
+        "logo": {
+          "type": "string",
+          "description": "URL to the seller's store logo.",
+          "format": "uri"
+        },
+        "region": {
+          "type": "string",
+          "description": "The Ethiopian region where the seller's business is located."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city where the seller's business is located."
+        },
+        "bankAccount": {
+          "type": "string",
+          "description": "Bank account details for seller payouts."
+        },
+        "tinNumber": {
+          "type": "string",
+          "description": "The seller's Tax Identification Number (TIN)."
+        },
+        "status": {
+          "type": "string",
+          "description": "The current approval status of the seller ('pending', 'approved', 'suspended', 'rejected').",
+          "format": "enum"
+        },
+        "rating": {
+          "type": "number",
+          "description": "The average rating of the seller, derived from product reviews.",
+          "format": "float"
+        },
+        "totalSales": {
+          "type": "number",
+          "description": "The total number of sales made by the seller.",
+          "format": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the seller account was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "storeName",
+        "region",
+        "city",
+        "status",
+        "rating",
+        "totalSales",
+        "createdAt"
+      ]
+    },
+    "Product": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Product",
+      "type": "object",
+      "description": "Details of a product listed for sale on the EthioMart platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Product entity."
+        },
+        "sellerId": {
+          "type": "string",
+          "description": "Reference to the seller who listed this product. (Relationship: Seller 1:N Product)"
+        },
+        "categoryId": {
+          "type": "string",
+          "description": "Reference to the category this product belongs to. (Relationship: Category 1:N Product)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the product."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the product."
+        },
+        "price": {
+          "type": "number",
+          "description": "The current selling price of the product in ETB.",
+          "format": "float"
+        },
+        "comparePrice": {
+          "type": "number",
+          "description": "An optional higher price for display, used to show discounts (e.g., 'was X, now Y').",
+          "format": "float"
+        },
+        "stock": {
+          "type": "number",
+          "description": "The current quantity of this product available in stock.",
+          "format": "integer"
+        },
+        "images": {
+          "type": "array",
+          "description": "An array of URLs to images of the product.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "specifications": {
+          "type": "string",
+          "description": "A JSON object containing various key-value specifications for the product."
+        },
+        "rating": {
+          "type": "number",
+          "description": "The average rating of the product, based on customer reviews.",
+          "format": "float"
+        },
+        "reviewCount": {
+          "type": "number",
+          "description": "The total number of reviews received for the product.",
+          "format": "integer"
+        },
+        "views": {
+          "type": "number",
+          "description": "The total number of times the product page has been viewed.",
+          "format": "integer"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the product ('pending', 'approved', 'rejected', 'archived').",
+          "format": "enum"
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Indicates if the product is marked as a featured item on the marketplace."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the product was listed.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "sellerId",
+        "categoryId",
+        "name",
+        "price",
+        "stock",
+        "images",
+        "rating",
+        "reviewCount",
+        "views",
+        "status",
+        "featured",
+        "createdAt"
+      ]
+    },
+    "Order": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Order",
+      "type": "object",
+      "description": "Represents a customer's purchase order, including status, totals, and shipping information.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Order entity."
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Reference to the customer who placed the order. (Relationship: User 1:N Order)"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current fulfillment status of the order ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled').",
+          "format": "enum"
+        },
+        "subtotal": {
+          "type": "number",
+          "description": "The sum of prices of all items in the order before shipping and taxes.",
+          "format": "float"
+        },
+        "shippingCost": {
+          "type": "number",
+          "description": "The cost of shipping for this order.",
+          "format": "float"
+        },
+        "total": {
+          "type": "number",
+          "description": "The grand total amount for the order, including subtotal and shipping.",
+          "format": "float"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "The method chosen by the customer for payment ('telebirr', 'cbe_birr', 'cod').",
+          "format": "enum"
+        },
+        "paymentStatus": {
+          "type": "string",
+          "description": "The current status of the payment for the order ('pending', 'paid', 'failed', 'refunded').",
+          "format": "enum"
+        },
+        "shippingAddress": {
+          "type": "string",
+          "description": "A JSON object containing the full shipping address details including fullName, phone, region, city, street, and notes."
+        },
+        "trackingNumber": {
+          "type": "string",
+          "description": "The tracking number for the shipment, if available."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the order was placed.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the order was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "customerId",
+        "status",
+        "subtotal",
+        "shippingCost",
+        "total",
+        "paymentMethod",
+        "paymentStatus",
+        "shippingAddress",
+        "createdAt"
+      ]
+    },
+    "OrderItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "OrderItem",
+      "type": "object",
+      "description": "Represents a single product item within a customer's order, storing its state at the time of purchase.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the OrderItem entity."
+        },
+        "orderId": {
+          "type": "string",
+          "description": "Reference to the order this item belongs to. (Relationship: Order 1:N OrderItem)"
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the product that was purchased. (Relationship: Product 1:N OrderItem)"
+        },
+        "sellerId": {
+          "type": "string",
+          "description": "Reference to the seller of the purchased product. (Relationship: Seller 1:N OrderItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the product purchased.",
+          "format": "integer"
+        },
+        "unitPrice": {
+          "type": "number",
+          "description": "The price of the product per unit at the time of purchase (snapshot).",
+          "format": "float"
+        },
+        "productName": {
+          "type": "string",
+          "description": "The name of the product at the time of purchase (snapshot)."
+        },
+        "productImage": {
+          "type": "string",
+          "description": "URL to the image of the product at the time of purchase (snapshot).",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "id",
+        "orderId",
+        "productId",
+        "sellerId",
+        "quantity",
+        "unitPrice",
+        "productName",
+        "productImage"
+      ]
+    },
+    "Review": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Review",
+      "type": "object",
+      "description": "Represents a customer's review and rating for a specific product after purchase.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Review entity."
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the product being reviewed. (Relationship: Product 1:N Review)"
+        },
+        "customerId": {
+          "type": "string",
+          "description": "Reference to the customer who submitted the review. (Relationship: User 1:N Review)"
+        },
+        "orderId": {
+          "type": "string",
+          "description": "Reference to the order through which the product was purchased, ensuring reviews are for bought items. (Relationship: Order 1:N Review)"
+        },
+        "rating": {
+          "type": "number",
+          "description": "The star rating given by the customer (1-5).",
+          "format": "integer",
+          "items": {
+            "type": "number"
+          }
+        },
+        "title": {
+          "type": "string",
+          "description": "A short title or summary for the review."
+        },
+        "comment": {
+          "type": "string",
+          "description": "The detailed text of the customer's review."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the review was submitted.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "productId",
+        "customerId",
+        "orderId",
+        "rating",
+        "createdAt"
+      ]
+    },
+    "CartItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CartItem",
+      "type": "object",
+      "description": "Represents a single product item added to a user's shopping cart.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CartItem entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the user who owns this cart item. (Relationship: User 1:N CartItem)"
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the product in the cart. (Relationship: Product 1:N CartItem)"
+        },
+        "quantity": {
+          "type": "number",
+          "description": "The quantity of the product in the cart.",
+          "format": "integer"
+        },
+        "addedAt": {
+          "type": "string",
+          "description": "Timestamp when the item was added to the cart.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "productId",
+        "quantity",
+        "addedAt"
+      ]
+    },
+    "WishlistItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WishlistItem",
+      "type": "object",
+      "description": "Represents a single product item added to a user's wishlist.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WishlistItem entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the user who owns this wishlist item. (Relationship: User 1:N WishlistItem)"
+        },
+        "productId": {
+          "type": "string",
+          "description": "Reference to the product in the wishlist. (Relationship: Product 1:N WishlistItem)"
+        },
+        "addedAt": {
+          "type": "string",
+          "description": "Timestamp when the item was added to the wishlist.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "productId",
+        "addedAt"
+      ]
+    },
+    "Notification": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Notification",
+      "type": "object",
+      "description": "Represents a notification sent to a user, informing them of important updates or events.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Notification entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the user who is the recipient of the notification. (Relationship: User 1:N Notification)"
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of notification (e.g., 'order_status', 'promo', 'system')."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title or subject of the notification."
+        },
+        "message": {
+          "type": "string",
+          "description": "The main content or body of the notification message."
+        },
+        "read": {
+          "type": "boolean",
+          "description": "Boolean indicating whether the user has read the notification."
+        },
+        "link": {
+          "type": "string",
+          "description": "An optional URL that the notification can link to.",
+          "format": "uri"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the notification was created.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "message",
+        "read",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores core user profile data, including their assigned role. Authorized by `request.auth.uid == userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/admin_roles/{adminUserId}",
+        "definition": {
+          "entityName": "admin_role",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Sentinel collection for admin role. Document existence indicates `admin` status for `adminUserId`. Used for `exists()` checks in rules for Authorization Independence. Documents in this collection are typically empty or contain minimal data.",
+          "params": [
+            {
+              "name": "adminUserId",
+              "description": "The unique ID of a user designated as an administrator."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/seller_roles/{sellerUserId}",
+        "definition": {
+          "entityName": "seller_role",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Sentinel collection for seller role. Document existence indicates `seller` status for `sellerUserId`. Used for `exists()` checks in rules for Authorization Independence. (This grants general seller privileges; specific seller store/product management requires checking against the Seller profile and product's `sellerUserId` field). Documents in this collection are typically empty or contain minimal data.",
+          "params": [
+            {
+              "name": "sellerUserId",
+              "description": "The unique ID of a user designated as a seller."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/categories/{categoryId}",
+        "definition": {
+          "entityName": "Category",
+          "schema": {
+            "$ref": "#/backend/entities/Category"
+          },
+          "description": "Publicly accessible product categories. Admin-only for creation and modification.",
+          "params": [
+            {
+              "name": "categoryId",
+              "description": "The unique ID of the product category."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sellers/{sellerId}",
+        "definition": {
+          "entityName": "Seller",
+          "schema": {
+            "$ref": "#/backend/entities/Seller"
+          },
+          "description": "Public and private seller store details. Includes `userId` (the User.id of the seller) for authorization. Admin can approve/reject. Authorized by `request.auth.uid == resource.data.userId` or `admin_role`.",
+          "params": [
+            {
+              "name": "sellerId",
+              "description": "The unique ID of the seller's store."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/products_public/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "Publicly visible products with `status: 'approved'`. Includes denormalized `sellerUserId` (the User.id of the seller) for authorization independence for seller updates, and `sellerId` for linking to seller profile. Ensures QAPs for public product listings.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "The unique ID of the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/sellers/{sellerId}/products_managed/{productId}",
+        "definition": {
+          "entityName": "Product",
+          "schema": {
+            "$ref": "#/backend/entities/Product"
+          },
+          "description": "All products managed by a specific seller, including drafts, pending, rejected, and approved. Denormalizes `sellerUserId` (the User.id of the seller) for authorization independence to allow the seller to manage their own products. Admin read/write via global admin role. Authorized by `request.auth.uid == request.resource.data.sellerUserId` or `admin_role`.",
+          "params": [
+            {
+              "name": "sellerId",
+              "description": "The unique ID of the seller's store."
+            },
+            {
+              "name": "productId",
+              "description": "The unique ID of the product."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{customerId}/orders/{orderId}",
+        "definition": {
+          "entityName": "Order",
+          "schema": {
+            "$ref": "#/backend/entities/Order"
+          },
+          "description": "Customer-specific orders. Includes `customerId` from path for authorization. Denormalizes `sellerIds` (array of all unique seller IDs involved) and `sellerUserIds` (array of all unique user IDs of sellers involved) to allow sellers/admins to efficiently query orders they are part of without `get()` calls. Authorized by `request.auth.uid == customerId`, `request.auth.uid in resource.data.sellerUserIds`, or `admin_role`.",
+          "params": [
+            {
+              "name": "customerId",
+              "description": "The unique ID of the customer who placed the order."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique ID of the order."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{customerId}/orders/{orderId}/orderItems/{orderItemId}",
+        "definition": {
+          "entityName": "OrderItem",
+          "schema": {
+            "$ref": "#/backend/entities/OrderItem"
+          },
+          "description": "Individual items within a customer's order. Includes `orderId`, `productId`, `sellerId`, and denormalizes `sellerUserId` (the User.id of the seller) and `customerId` from parent path for authorization independence. Authorized by `request.auth.uid == customerId`, `request.auth.uid == resource.data.sellerUserId`, or `admin_role`.",
+          "params": [
+            {
+              "name": "customerId",
+              "description": "The unique ID of the customer who placed the order."
+            },
+            {
+              "name": "orderId",
+              "description": "The unique ID of the order this item belongs to."
+            },
+            {
+              "name": "orderItemId",
+              "description": "The unique ID of the order item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/products_public/{productId}/reviews/{reviewId}",
+        "definition": {
+          "entityName": "Review",
+          "schema": {
+            "$ref": "#/backend/entities/Review"
+          },
+          "description": "Customer reviews for public products. Includes `productId` from path and denormalized `customerId` and `orderId` within the document for authorization. Ensures QAPs for product review listings. Authorized for writes by `request.auth.uid == request.resource.data.customerId` and backend validation for purchase, or `admin_role`.",
+          "params": [
+            {
+              "name": "productId",
+              "description": "The unique ID of the product being reviewed."
+            },
+            {
+              "name": "reviewId",
+              "description": "The unique ID of the review."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/cartItems/{cartItemId}",
+        "definition": {
+          "entityName": "CartItem",
+          "schema": {
+            "$ref": "#/backend/entities/CartItem"
+          },
+          "description": "User's shopping cart items. Includes `userId` from parent path and `productId` for linkage. Authorized by `request.auth.uid == userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who owns this cart item."
+            },
+            {
+              "name": "cartItemId",
+              "description": "The unique ID of the cart item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/wishlistItems/{wishlistItemId}",
+        "definition": {
+          "entityName": "WishlistItem",
+          "schema": {
+            "$ref": "#/backend/entities/WishlistItem"
+          },
+          "description": "User's wishlist items. Includes `userId` from parent path and `productId` for linkage. Authorized by `request.auth.uid == userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who owns this wishlist item."
+            },
+            {
+              "name": "wishlistItemId",
+              "description": "The unique ID of the wishlist item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/notifications/{notificationId}",
+        "definition": {
+          "entityName": "Notification",
+          "schema": {
+            "$ref": "#/backend/entities/Notification"
+          },
+          "description": "User-specific notifications. Includes `userId` from parent path. Authorized by `request.auth.uid == userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user who is the recipient of the notification."
+            },
+            {
+              "name": "notificationId",
+              "description": "The unique ID of the notification."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for EthioMart is designed with a strong emphasis on security, scalability, and debuggability, adhering to the core design principles and strategy mandates. The primary goal is to ensure Authorization Independence (CRITICAL) by eliminating hierarchical authorization dependencies (avoiding `get()` calls in security rules) and supporting Query-Able Paths (QAPs) for secure `list` operations.\n\n**Authorization Independence via Denormalization:**\nTo achieve Authorization Independence, critical authorization context is denormalized directly into the relevant documents:\n1.  **User Roles:** Instead of relying on a `get()` call to a user's full profile to determine their role (e.g., admin or seller), dedicated sentinel collections (`/admin_roles/{adminUserId}` and `/seller_roles/{sellerUserId}`) are used. The mere existence of a document at these paths for `request.auth.uid` signifies the respective role, allowing for efficient and independent `exists()` checks in security rules. The main `/users/{userId}` collection still stores the full `User` entity, but cross-collection role checks do not depend on it.\n2.  **Seller-Owned Data:** For entities like `Product` that are owned by a `Seller`, the actual `User.id` of the seller (referred to as `sellerUserId` conceptually extending the `Product` schema) is denormalized into the `Product` document itself. This allows a seller to manage their products by checking `request.auth.uid == resource.data.sellerUserId` without needing to `get()` the parent `Seller` document to find its associated `userId`.\n3.  **Order Access for Sellers:** `Order` documents (stored under `/users/{customerId}/orders/{orderId}`) will conceptually include an array of all `sellerUserIds` (the `User.id`s of sellers who have items in that order). This denormalization enables sellers to query their associated orders using `array-contains` in a `list` operation, and allows rules to authorize seller access to specific orders without needing to iterate through `orderItems` or perform `get()` calls.\n4.  **OrderItem Access:** `OrderItem` documents (under `/users/{customerId}/orders/{orderId}/orderItems/{orderItemId}`) will conceptually include `sellerUserId` to allow direct authorization checks for the seller of that specific item.\n\n**QAPs (Query-Able Paths) & Structural Segregation:**\nStructural segregation is applied to ensure homogeneous security postures within collections, thereby enabling secure `list` operations and addressing QAPs:\n1.  **Products:** To differentiate between publicly visible products and those managed by sellers (including drafts, pending, etc.), two distinct collections are used:\n    *   `/products_public/{productId}`: Contains *only* products with `status: 'approved'`. This collection has a homogeneous public read security posture, allowing secure `list` operations for all users seeking approved products. Writes are restricted to admins or approved sellers for their own products.\n    *   `/sellers/{sellerId}/products_managed/{productId}`: This subcollection stores *all* products associated with a specific seller, regardless of their status. Its security posture is private, accessible only by the owner (`sellerUserId` matching `request.auth.uid`) or administrators. This allows sellers to manage their complete product catalog securely without exposing unapproved products publicly.\n2.  **Customer-Specific Data:** Collections like `orders`, `cartItems`, `wishlistItems`, and `notifications` are structured hierarchically under `/users/{userId}/...`. This path-based ownership (`request.auth.uid == userId`) provides inherent security and allows for straightforward, secure `list` operations (e.g., a user can list all their own orders).\n3.  **Categories and Public Reviews:** `/categories/{categoryId}` and `/products_public/{productId}/reviews/{reviewId}` are designed for public read access, with tightly controlled write access (admin for categories, authenticated customer for reviews after purchase). Their homogeneous access patterns allow for secure public `list` operations.\n\nThis architecture minimizes rule complexity by pushing authorization logic into the data structure, making security rules easier to write, understand, and debug, while maintaining scalability and performance characteristics inherent to Firestore."
+  }
+}

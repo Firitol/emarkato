@@ -1,0 +1,227 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * ETHIOMART SECURITY RULES
+     * 
+     * CORE PHILOSOPHY:
+     * This ruleset implements a strict user-ownership model complemented by role-based access 
+     * control (RBAC). It prioritizes "Authorization Independence" to ensure that security 
+     * decisions are made quickly and at scale without chained lookups.
+     * 
+     * DATA STRUCTURE:
+     * - /users/{userId}: Private user profiles and nested personal data (orders, carts, notifications).
+     * - /products_public: Flat collection for approved, discoverable items.
+     * - /sellers/{sellerId}/products_managed: Private workspaces for sellers to manage inventory.
+     * - /admin_roles & /seller_roles: Sentinel collections for high-performance role verification.
+     * 
+     * KEY SECURITY DECISIONS:
+     * 1. Sentinel Lookups: Roles (Admin/Seller) are verified via existence checks in dedicated 
+     *    sentinel collections, avoiding expensive reads of the full User document.
+     * 2. Denormalization for Authorization: Critical IDs (like sellerUserId) are duplicated 
+     *    on documents to allow local authorization without fetching parent records.
+     * 3. Structural Segregation: Publicly approved products are moved to a separate collection 
+     *    from a seller's managed drafts to simplify listing rules and prevent data leakage.
+     * 4. Prototyping Flexibility: Rules enforce WHO can write but do not strictly validate 
+     *    field types (string vs number) to allow rapid feature iteration.
+     */
+
+    // --- HELPER FUNCTIONS ---
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && exists(/databases/$(database)/documents/admin_roles/$(request.auth.uid));
+    }
+
+    function isSeller() {
+      return isSignedIn() && exists(/databases/$(database)/documents/seller_roles/$(request.auth.uid));
+    }
+
+    function isExistingOwner(userId) {
+      return resource != null && isOwner(userId);
+    }
+
+    // --- COLLECTIONS ---
+
+    /**
+     * @description Rules for user profiles. Users can manage their own data; Admins can view/manage.
+     * @path /users/{userId}
+     * @allow (create) if auth.uid matches path and internal id.
+     * @deny (list) Listing all users is forbidden for privacy.
+     * @principle Path-based ownership and relational integrity.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if (isExistingOwner(userId) || isAdmin()) && request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Sentinel collection for admin role management.
+     * @path /admin_roles/{adminUserId}
+     * @allow (get) Any signed-in user can check existence for auth logic.
+     * @deny (write) Only existing admins can modify roles.
+     * @principle Sentinel-based role authorization.
+     */
+    match /admin_roles/{adminUserId} {
+      allow get: if isSignedIn();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Sentinel collection for seller role management.
+     * @path /seller_roles/{sellerUserId}
+     * @allow (get) Any signed-in user can check existence for auth logic.
+     * @deny (write) Only admins can assign or revoke seller status.
+     * @principle Role-based access control via sentinel documents.
+     */
+    match /seller_roles/{sellerUserId} {
+      allow get: if isSignedIn();
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Product categories. Publicly readable; Admin-only management.
+     * @path /categories/{categoryId}
+     * @allow (list) Publicly accessible for browsing.
+     * @deny (write) Prevent non-admins from altering taxonomy.
+     * @principle Public Read with Admin-Only Writes.
+     */
+    match /categories/{categoryId} {
+      allow get, list: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    /**
+     * @description Seller store details. Publicly readable; Seller/Admin managed.
+     * @path /sellers/{sellerId}
+     * @allow (update) If user is the owner linked via userId field.
+     * @deny (create) Only admins can initialize seller profiles.
+     * @principle Ownership linked via document field with admin oversight.
+     */
+    match /sellers/{sellerId} {
+      allow get, list: if true;
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (isOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId);
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Publicly visible approved products.
+     * @path /products_public/{productId}
+     * @allow (create) Seller creating an approved listing.
+     * @deny (update) If sellerUserId is changed during update.
+     * @principle Shared public access with owner-only modifications.
+     */
+    match /products_public/{productId} {
+      allow get, list: if true;
+      allow create: if isAdmin() || (isSeller() && request.resource.data.sellerUserId == request.auth.uid);
+      allow update: if isAdmin() || (isOwner(resource.data.sellerUserId) && request.resource.data.sellerUserId == resource.data.sellerUserId);
+      allow delete: if isAdmin() || isOwner(resource.data.sellerUserId);
+    }
+
+    /**
+     * @description Comprehensive product workspace for sellers (Drafts/Pending/Approved).
+     * @path /sellers/{sellerId}/products_managed/{productId}
+     * @allow (list) Seller listing their own inventory.
+     * @deny (create) Mismatched sellerUserId in data.
+     * @principle Path-based and field-based ownership for private workspaces.
+     */
+    match /sellers/{sellerId}/products_managed/{productId} {
+      allow get, list: if isAdmin() || isSeller() && exists(/databases/$(database)/documents/sellers/$(sellerId)) && get(/databases/$(database)/documents/sellers/$(sellerId)).data.userId == request.auth.uid;
+      allow create: if isAdmin() || (isSeller() && request.resource.data.sellerUserId == request.auth.uid);
+      allow update: if isAdmin() || (isOwner(resource.data.sellerUserId) && request.resource.data.sellerUserId == resource.data.sellerUserId);
+      allow delete: if isAdmin() || isOwner(resource.data.sellerUserId);
+    }
+
+    /**
+     * @description Customer orders. Visible to customer, participating sellers, and admins.
+     * @path /users/{customerId}/orders/{orderId}
+     * @allow (list) Owner listing their purchase history.
+     * @deny (update) Customer changing total or payment status.
+     * @principle Multi-party access using denormalized ID arrays.
+     */
+    match /users/{customerId}/orders/{orderId} {
+      allow get: if isOwner(customerId) || isAdmin() || (isSignedIn() && request.auth.uid in resource.data.sellerUserIds);
+      allow list: if isOwner(customerId) || isAdmin();
+      allow create: if isOwner(customerId) && request.resource.data.customerId == customerId;
+      allow update: if isAdmin() || (isSignedIn() && request.auth.uid in resource.data.sellerUserIds);
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Items within an order. Access matches parent order permissions.
+     * @path /users/{customerId}/orders/{orderId}/orderItems/{orderItemId}
+     * @allow (get) Seller of this specific item.
+     * @principle Relational integrity and delegated ownership.
+     */
+    match /users/{customerId}/orders/{orderId}/orderItems/{orderItemId} {
+      allow get, list: if isOwner(customerId) || isAdmin() || (isSignedIn() && resource.data.sellerUserId == request.auth.uid);
+      allow create: if isOwner(customerId);
+      allow update: if isAdmin() || (isSignedIn() && resource.data.sellerUserId == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    /**
+     * @description Product reviews. Public read; Purchase-validated write (abstracted).
+     * @path /products_public/{productId}/reviews/{reviewId}
+     * @allow (create) Verified customer submitting a review.
+     * @principle Public Read with Author-Only Writes.
+     */
+    match /products_public/{productId}/reviews/{reviewId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.customerId == request.auth.uid;
+      allow update: if isAdmin() || (isOwner(resource.data.customerId) && request.resource.data.customerId == resource.data.customerId);
+      allow delete: if isAdmin() || isOwner(resource.data.customerId);
+    }
+
+    /**
+     * @description User's private shopping cart.
+     * @path /users/{userId}/cartItems/{cartItemId}
+     * @allow (list) Owner viewing their cart.
+     * @deny (create) Adding items to another user's cart.
+     * @principle Private user-scoped subcollection.
+     */
+    match /users/{userId}/cartItems/{cartItemId} {
+      allow get, list, create: if isOwner(userId);
+      allow update, delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description User's private wishlist.
+     * @path /users/{userId}/wishlistItems/{wishlistItemId}
+     * @allow (list) Owner viewing their wishlist.
+     * @principle Private user-scoped subcollection.
+     */
+    match /users/{userId}/wishlistItems/{wishlistItemId} {
+      allow get, list, create: if isOwner(userId);
+      allow update, delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description User-specific notifications.
+     * @path /users/{userId}/notifications/{notificationId}
+     * @allow (update) Marking a notification as read.
+     * @deny (create) Client-side creation of notifications is typically system-only.
+     * @principle Ownership for read-access and state-updates.
+     */
+    match /users/{userId}/notifications/{notificationId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isAdmin(); // Notifications typically generated by system/admin
+      allow update: if isExistingOwner(userId);
+      allow delete: if isExistingOwner(userId);
+    }
+  }
+}
