@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Navbar } from '@/components/Navbar';
@@ -18,6 +19,10 @@ export default function HomePage() {
   const { products, user } = useAppStore();
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const featuredProducts = products.filter(p => p.featured);
+
+  const heroBg = PlaceHolderImages.find(img => img.id === 'hero-bg')?.imageUrl;
+  const habeshaDress = PlaceHolderImages.find(img => img.id === 'habesha-dress')?.imageUrl;
+  const jebena = PlaceHolderImages.find(img => img.id === 'jebena')?.imageUrl;
 
   useEffect(() => {
     async function loadRecommendations() {
@@ -44,14 +49,16 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative h-[600px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image 
-            src={PlaceHolderImages.find(img => img.id === 'hero-bg')?.imageUrl || ''} 
-            alt="Hero Background"
-            fill
-            className="object-cover opacity-20"
-            priority
-            data-ai-hint="ethiopian textile"
-          />
+          {heroBg && (
+            <Image 
+              src={heroBg} 
+              alt="Hero Background"
+              fill
+              className="object-cover opacity-20"
+              priority
+              data-ai-hint="ethiopian textile"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-r from-cream via-cream/80 to-transparent" />
         </div>
 
@@ -83,22 +90,26 @@ export default function HomePage() {
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[450px] h-[450px] bg-accent/20 rounded-full blur-3xl" />
             <div className="relative z-10 w-full h-full flex items-center justify-center">
               <div className="relative w-[320px] h-[450px] transform -rotate-6 transition-transform hover:rotate-0 duration-500 shadow-2xl rounded-2xl overflow-hidden">
-                <Image 
-                  src={PlaceHolderImages.find(img => img.id === 'habesha-dress')?.imageUrl || ''} 
-                  alt="Traditional Dress"
-                  fill
-                  className="object-cover"
-                  data-ai-hint="traditional dress"
-                />
+                {habeshaDress && (
+                  <Image 
+                    src={habeshaDress} 
+                    alt="Traditional Dress"
+                    fill
+                    className="object-cover"
+                    data-ai-hint="traditional dress"
+                  />
+                )}
               </div>
               <div className="absolute -bottom-6 -right-6 w-[200px] h-[250px] transform rotate-12 transition-transform hover:rotate-0 duration-500 shadow-2xl rounded-2xl overflow-hidden border-4 border-white">
-                <Image 
-                  src={PlaceHolderImages.find(img => img.id === 'jebena')?.imageUrl || ''} 
-                  alt="Jebena"
-                  fill
-                  className="object-cover"
-                  data-ai-hint="coffee pot"
-                />
+                {jebena && (
+                  <Image 
+                    src={jebena} 
+                    alt="Jebena"
+                    fill
+                    className="object-cover"
+                    data-ai-hint="coffee pot"
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -141,7 +152,6 @@ export default function HomePage() {
             <Link key={cat.id} href={`/category/${cat.id}`} className="group">
               <div className="aspect-square bg-white rounded-2xl p-6 flex flex-col items-center justify-center gap-3 border border-primary/5 shadow-sm group-hover:shadow-md group-hover:border-primary/20 transition-all">
                 <div className="w-12 h-12 bg-cream rounded-full flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors">
-                  {/* Mock dynamic icon from lucide names would be here */}
                   <Image src={`https://picsum.photos/seed/${cat.id}/100/100`} alt={cat.name} width={40} height={40} className="rounded-full grayscale group-hover:grayscale-0" />
                 </div>
                 <span className="text-xs font-bold text-center group-hover:text-primary transition-colors">{cat.name}</span>
